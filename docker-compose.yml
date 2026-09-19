@@ -1,0 +1,61 @@
+# Template
+# llama.cpp OpenAI-compatible server (/v1) with tool calling, on one or more GPUs.
+services:
+  llama:
+    image: ${LLAMA_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-cuda}
+    container_name: llama-server
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    volumes:
+      - models:/models
+    environment:
+      LLAMA_CACHE: /models
+      HF_TOKEN: ${HF_TOKEN:-}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command:
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8080"
+      - -hf
+      - "${MODEL:-unsloth/Nemotron-3-Nano-30B-A3B-GGUF:IQ4_XS}"
+      - --alias
+      - "${MODEL_ALIAS:-nemotron}"
+      - --api-key
+      - "${LLAMA_API_KEY:?run ./setup.sh to build dist/docker-compose.yml}"
+      - --jinja # tool calling
+      - --n-gpu-layers
+      - "999"
+      - --split-mode # multi-GPU: layer or row
+      - "${SPLIT_MODE:-layer}"
+      - --n-cpu-moe # MoE layers kept in CPU RAM if VRAM is short
+      - "${N_CPU_MOE:-0}"
+      - --flash-attn
+      - "on"
+      - --ctx-size
+      - "${CTX_SIZE:-131072}"
+      - --parallel
+      - "${PARALLEL:-1}"
+      - --temp
+      - "${TEMPERATURE:-0.6}"
+      - --top-p
+      - "${TOP_P:-0.95}"
+      - --min-p
+      - "0.01"
+      - --metrics
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20m
+
+volumes:
+  models:
