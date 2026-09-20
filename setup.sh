@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Parts of this is ai generated (interactive part)
 # Usage: ./setup.sh [preset | <hf-user>/<repo>[:<quant>]]
 #   Optional env: LLAMA_API_KEY, CTX_SIZE, PARALLEL, TEMPERATURE, TOP_P, N_CPU_MOE, SPLIT_MODE, PORT, HF_TOKEN
 set -Eeuo pipefail
