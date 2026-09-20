@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# This script was written by claude
 # Tests a running server built from dist/docker-compose.yml.
 # Usage: ./test.sh [base-url]        e.g. ./test.sh http://1.2.3.4:8080
 #   Key and model are read from dist/docker-compose.yml; override with LLAMA_API_KEY / MODEL_ALIAS.
